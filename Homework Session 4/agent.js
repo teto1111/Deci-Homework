@@ -8,27 +8,28 @@ const logger = require('./utils/logger');
 
 const [,, command, ...args] = process.argv;
 
-// Helper to get absolute path
+// Helper to get absolute path (Step 4)
 const getPath = (file) => path.resolve(process.cwd(), file);
 
 const help = () => {
   console.log(`
   Agent Quest CLI
   Commands:
-    drop <file> <msg>  - Create a file with a message
-    peek <file>        - Read file contents
-    add <file> <msg>   - Append text to a file
-    shred <file>       - Delete a file
-    clone <src> <dest> - Copy a file using streams
-    seal <file>        - Compress a file (Gzip)
+    drop <file> <msg>   - Create a file with a message
+    peek <file>         - Read file contents
+    add <file> <msg>    - Append text to a file
+    shred <file>        - Delete a file
+    clone <src> <dest>  - Copy a file using streams
+    seal <file>         - Compress a file (Gzip)
   Flags:
-    -h, --help         - Show help
-    -v, --version      - Show version
+    -h, --help          - Show help
+    -v, --version       - Show version
   `);
 };
 
 (async () => {
   try {
+    // Step 3: Flags
     if (command === '-h' || command === '--help' || !command) {
       help();
       return;
@@ -39,50 +40,53 @@ const help = () => {
       return;
     }
 
+    // Step 9: Handling User Commands
     switch (command) {
-      case 'drop': {
+      case 'drop': { // Step 4
         const [file, msg] = args;
         fs.writeFileSync(getPath(file), msg);
         logger.info(`Secret dropped into ${file}`);
         break;
       }
 
-      case 'peek': {
+      case 'peek': { // Step 5
         const file = args[0];
-        if (!fs.existsSync(getPath(file))) {
+        const targetPath = getPath(file);
+        if (!fs.existsSync(targetPath)) {
           logger.error(`File ${file} not found.`);
           return;
         }
-        const data = fs.readFileSync(getPath(file), 'utf8');
-        console.log(`--- Contents of ${file} ---`);
-        console.log(data);
+        const data = fs.readFileSync(targetPath, 'utf8');
+        console.log(`--- Contents of ${file} ---\n${data}`);
         break;
       }
 
-      case 'add': {
+      case 'add': { // Step 6
         const [file, msg] = args;
         fs.appendFileSync(getPath(file), `\n${msg}`);
         logger.info(`Intel added to ${file}`);
         break;
       }
 
-      case 'shred': {
+      case 'shred': { // Step 6
         const file = args[0];
         fs.unlinkSync(getPath(file));
         logger.info(`${file} has been shredded.`);
         break;
       }
 
-      case 'clone': {
+      case 'clone': { // Step 7
         const [src, dest] = args;
         const readStream = fs.createReadStream(getPath(src));
         const writeStream = fs.createWriteStream(getPath(dest));
+        
         readStream.pipe(writeStream);
         writeStream.on('finish', () => logger.info(`${src} cloned to ${dest}`));
+        writeStream.on('error', (err) => logger.error(`Clone failed: ${err.message}`));
         break;
       }
 
-      case 'seal': {
+      case 'seal': { // Step 8
         const file = args[0];
         const source = fs.createReadStream(getPath(file));
         const destination = fs.createWriteStream(getPath(`${file}.gz`));

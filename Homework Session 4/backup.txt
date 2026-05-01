@@ -1,2 +1,2 @@
-Top secret: The agent is in the lobby.
-Update: The target has moved.
+Mission Start: Proceed to Giza.
+Backup team is standing by.
