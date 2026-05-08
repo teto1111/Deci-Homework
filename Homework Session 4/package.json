@@ -1,0 +1,16 @@
+{
+  "name": "agent-quest",
+  "version": "1.0.0",
+  "description": "A CLI tool for secret agents",
+  "main": "agent.js",
+  "bin": {
+    "agent": "./agent.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test spec scheduled\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
